@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.green.borrow.user.UserMapper">
+
+    <select id="dd">
+        SELECT * FROM t_user U
+        LEFT JOIN t_product P
+        ON P.iuser = U.iuser AND P.istatus IN (-1, -2)
+        JOIN t_product_payment PP
+        ON P.iproduct = PP.iproduct
+        JOIN t_payment PA
+        ON PP.ipayment = PA.ipayment AND PA.istatus IN (1, -1, -2, -3)
+        WHERE U.iuser = 2;
+    </select>
+
+    <select id="selBeforDelUser">
+        SELECT A.iuser, B.iproduct, B.istatus, D.istatus AS cancel, D.ipayment, D.ibuyer, E.iproduct
+        FROM t_user A
+        LEFT JOIN t_product B
+        ON A.iuser = B.iuser AND B.istatus IN (-1, -2)
+        JOIN t_product_payment C <!--LEFT JOIN할 경우 결제되지 않은 내역도 뜨기 때문에 INNER JOIN으로 변경-->
+        ON B.iproduct = C.iproduct
+        LEFT JOIN t_payment D
+        ON C.ipayment = D.ipayment AND D.istatus IN(1, -1, -2, -3)
+        WHERE A.iuser = #{iuser};
+    </select>
+
+    <!--유저삭제 전 사진 삭제-->
+    <delete id="delUserByPics">
+        DELETE FROM t_pics
+        WHERE iproduct =#{iproduct}
+    </delete>
+
+    <!--유저삭제 전 결제 숨김-->
+    <update id="delUserByPaymentHiding">
+        UPDAE t_payment <!--회원탈퇴시 ibuyer null인 조건-->
+            SET ibuyer = null
+        WHERE ibuyer =#{iuser} <!--조건 : 입력받은 유저가 결제한 결제PK-->
+    </update>
+
+    <!--유저삭제 전 물품등록건 삭제-->
+    <delete id="delUserByProduct">
+        DELETE FROM t_product
+        <if test="istatus != 0">
+            WHERE iuser = #{iuser}
+        </if>
+
+    </delete>
+    
+    <delete id="delUser"> <!-- 최종단계 유저 삭제 -->
+        DELETE FROM t_user
+        WHERE iuser = #{iuser}
+    </delete>
+
+
+</mapper>
