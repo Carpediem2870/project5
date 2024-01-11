@@ -10,5 +10,5 @@ public class UserSelVo {
     private int cancel; // 결제 istatus
     private int ipayment; // 지불pk
     private int ibuyer; // 빌린 pk
-//테스트ㅇㅎㄹㄹㄻㅇㄴㄻㄴㅇㄹ
+//테스트ㅇㅎㄹㄹㄻㅇㄴㄻㄴㅇㄹㄹㄴㅇㅎㅎㅇㄶㅇㄹㄶㄴㅇㄹ
 }
